@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protein Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            color: #1a1a1a;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ✅ Full Page Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('/static/images/loginbg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            z-index: -1;
+        }
+
+        .content-container {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            background: rgba(235, 234, 234, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        /* ✅ Sidebar Content */
+        .sidebar-content {
+            width: 40%;
+            padding: 4rem;
+            position: relative;
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* ✅ Main Content */
+        .main-content {
+            width: 60%;
+            padding: 4rem;
+            position: relative;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, #1a1a1a, #4a4a4a);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .nav-link {
+            color: #1a1a1a;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+            display: block;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: #000000;
+        }
+
+        .form-group {
+            margin-bottom: 2.5rem;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 2rem;
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+        }
+
+        label {
+            display: block;
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 1.2rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            color: #1a1a1a;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #000000;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 1.2rem;
+            background: #090909;
+            border: none;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #000000;
+            transform: translateY(-2px);
+        }
+
+        /* ✅ Styling for Protein Prediction Result */
+        .result-container {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-align: center;
+            display: none;
+        }
+
+        .result {
+            background: rgba(52, 211, 153, 0.3);
+            color: #065f46;
+            border: 1px solid rgba(52, 211, 153, 0.5);
+        }
+
+        .error {
+            background: rgba(255, 51, 102, 0.3);
+            color: #be123c;
+            border: 1px solid rgba(255, 51, 102, 0.5);
+        }
+
+        @media (max-width: 1024px) {
+            .content-container {
+                flex-direction: column;
+            }
+
+            .sidebar-content,
+            .main-content {
+                width: 100%;
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="content-container">
+        <!-- ✅ Sidebar Content -->
+        <div class="sidebar-content">
+            <h1>Protein Calculator</h1>
+            <a href="{{ url_for('tracker') }}" class="nav-link">View Protein Goal Tracker →</a>
+            <a href="{{ url_for('logout') }}" class="nav-link">🚪 Logout</a>
+        </div>
+      
+        <!-- ✅ Main Content -->
+        <main class="main-content">
+            <form id="prediction-form">
+                <div class="form-group">
+                    <label for="food-item">Select Food</label>
+                    <select id="food-item" name="food-item">
+                        <option value="beef">Beef</option>
+                        <option value="chicken breast">Chicken Breast</option>
+                        <option value="eggs">Eggs</option>
+                        <option value="tofu">Tofu</option>
+                        <option value="rice">Rice</option>
+                        <option value="lentils">Lentils</option>
+                        <option value="panner">Paneer</option>
+                        <option value="fish">Fish</option>
+                        <option value="potato">Potato</option>
+                        <option value="salmon">Salmon</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="grams">Amount (in grams)</label>
+                    <input type="number" id="grams" name="grams" placeholder="Enter amount" required>
+                </div>
+
+                <button type="submit">Calculate Protein</button>
+            </form>
+
+            <!-- ✅ Protein Prediction Results -->
+            <div class="result-container" id="result-container">
+                <p id="result-text"></p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('prediction-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            const resultContainer = document.getElementById('result-container');
+            const resultText = document.getElementById('result-text');
+            
+            resultContainer.style.display = 'none';
+            
+            const foodItem = document.getElementById('food-item').value;
+            const grams = document.getElementById('grams').value;
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ food_item: foodItem, grams: grams })
+                });
+                
+                const data = await response.json();
+                resultText.textContent = `Predicted Protein Content: ${data.protein}g`;
+                resultContainer.className = 'result-container result';
+                resultContainer.style.display = 'block';
+            } catch {
+                resultText.textContent = 'Error fetching prediction.';
+                resultContainer.className = 'result-container error';
+                resultContainer.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

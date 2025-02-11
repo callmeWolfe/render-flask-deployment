@@ -1,0 +1,291 @@
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f7f7f7;
+        background-image: url("/static/images/shell.jpg");
+        min-height: 100vh;
+        display: flex;
+    }
+
+    /* Left Side Panel */
+    .food-list-panel {
+        width: 300px;
+        height: 100vh;
+        background: white;
+        padding: 20px;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        left: 0;
+        top: 0;
+        overflow-y: auto;
+    }
+
+    .food-list h3 {
+        color: #333;
+        font-size: 22px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .food-list ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .food-list li {
+        background: #f8f9fa;
+        padding: 16px 20px;
+        margin-bottom: 12px;
+        border-radius: 8px;
+        font-size: 16px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 15px;
+        align-items: center;
+        transition: all 0.3s ease;
+        border-left: 4px solid #4a90e2;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .food-list li:hover {
+        transform: translateX(5px);
+        background: #f0f4f8;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .food-list li span:first-child {
+        color: #2c3e50;
+        font-weight: 500;
+        text-align: left;
+    }
+
+    .food-list li span:last-child {
+        color: #4a90e2;
+        font-weight: 600;
+        background: rgba(74, 144, 226, 0.1);
+        padding: 6px 12px;
+        border-radius: 20px;
+        min-width: 60px;
+        text-align: center;
+    }
+
+    /* Main Content Area */
+    .main-content {
+        margin-left: 300px;
+        flex-grow: 1;
+        padding: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    .container {
+        background: #e6f1f7;
+        padding: 80px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 600%;
+        max-width: 600px;
+    }
+
+    .weekly-summary {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin: 30px 0;
+    }
+
+    .weekly-summary h2 {
+        color: #000000;
+        font-size: 24px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .stats-grid {
+        display:ruby;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .day-stat {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        border-top: 3px solid #4a90e2;
+    }
+
+    .day-name {
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .day-percentage {
+        font-size: 20px;
+        color: #4a90e2;
+        margin: 8px 0;
+    }
+
+    .day-details {
+        font-size: 14px;
+        color: #666;
+    }
+
+    .goal-met {
+        border-top-color: #28a745;
+    }
+
+    .goal-missed {
+        border-top-color: #dc3545;
+    }
+
+    .loading, .error {
+        text-align: center;
+        padding: 20px;
+        color: #666;
+    }
+
+    .error {
+        color: #dc3545;
+    }
+
+    h1 {
+        color: #333;
+        font-size: 28px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    label {
+        display: block;
+        margin: 15px 0 5px;
+        color: #555;
+        font-size: 18px;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        font-size: 16px;
+    }
+
+    button {
+        width: 100%;
+        padding: 14px;
+        background-color: #000;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    button:hover {
+        background-color: #333;
+    }
+
+    .goal-status {
+        margin: 30px 0;
+        font-size: 20px;
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 6px;
+        text-align: center;
+    }
+
+    .back-button {
+        display: inline-block;
+        background-color: white;
+        color: black;
+        padding: 12px 20px;
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+        border: 2px solid #000;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+    }
+
+    .back-button:hover {
+        background-color: #000;
+        color: white;
+    }
+    .delete-btn {
+background: none;
+border: none;
+color: red;
+font-size: 18px;
+cursor: pointer;
+transition: color 0.3s ease;
+}
+
+.delete-btn:hover {
+color: darkred;
+}
+
+    /* Custom scrollbar */
+    .food-list-panel::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .food-list-panel::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .food-list-panel::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 4px;
+    }
+
+    .food-list-panel::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .food-list-panel {
+            width: 250px;
+        }
+        .main-content {
+            margin-left: 250px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        body {
+            flex-direction: column;
+        }
+        .food-list-panel {
+            width: 100%;
+            height: auto;
+            position: relative;
+            max-height: 300px;
+        }
+        .main-content {
+            margin-left: 0;
+            padding-top: 0;
+        }
+        .stats-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>

@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protein Goal Tracker</title>
+    <style>
+        /* Your existing styles remain unchanged */
+    </style>
+</head>
+<body>
+    <!-- Left Side Panel -->
+    <div class="food-list-panel">
+        <div class="food-list">
+            <h3>Added Food Items:</h3>
+            <ul id="food-list"></ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <h1>Protein Goal Tracker</h1>
+            
+            <a href="{{ url_for('index') }}" class="back-button">🏠 Back to Main Page</a>
+
+            <form id="goal-form">
+                <label for="protein_goal">Set Daily Protein Goal (grams):</label>
+                <input type="number" id="protein_goal" placeholder="Enter your goal" required>
+                <button type="submit">Set Goal</button>
+            </form>
+
+            <div class="goal-status">
+                <p>Protein Goal: <span id="goal-display">0</span> grams</p>
+                <p>Protein Remaining: <span id="remaining-display">0</span> grams</p>
+            </div>
+
+            <div class="weekly-summary">
+                <h2>Weekly Progress</h2>
+                <div class="weekly-stats" id="weekly-stats">
+                    <div class="stats-grid">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <form id="food-form">
+                <label for="food_item">Food Item:</label>
+                <input type="text" id="food_item" placeholder="Enter food item" required>
+
+                <label for="protein_content">Protein Content (grams):</label>
+                <input type="number" id="protein_content" placeholder="Enter protein content" required>
+
+                <button type="submit">Add Food</button>
+            </form>
+        </div>
+    </div>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+            background-image: url("/static/images/shell.jpg");
+            min-height: 100vh;
+            display: flex;
+        }
+    
+        /* Left Side Panel */
+        .food-list-panel {
+            width: 300px;
+            height: 100vh;
+            background: white;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+        }
+    
+        .food-list h3 {
+            color: #333;
+            font-size: 22px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+    
+        .food-list ul {
+            list-style: none;
+            padding: 0;
+        }
+    
+        .food-list li {
+            background: #f8f9fa;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-left: 4px solid #4a90e2;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+    
+        .food-list li:hover {
+            transform: translateX(5px);
+            background: #f0f4f8;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    
+        .food-list li span:first-child {
+            color: #2c3e50;
+            font-weight: 500;
+            text-align: left;
+        }
+    
+        .food-list li span:last-child {
+            color: #4a90e2;
+            font-weight: 600;
+            background: rgba(74, 144, 226, 0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+            min-width: 60px;
+            text-align: center;
+        }
+    
+        /* Main Content Area */
+        .main-content {
+            margin-left: 300px;
+            flex-grow: 1;
+            padding: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+    
+        .container {
+            background: #e6f1f7;
+            padding: 80px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 600%;
+            max-width: 600px;
+        }
+    
+        .weekly-summary {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 30px 0;
+        }
+    
+        .weekly-summary h2 {
+            color: #000000;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    
+        .stats-grid {
+            display:ruby;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+    
+        .day-stat {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-top: 3px solid #4a90e2;
+        }
+    
+        .day-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+    
+        .day-percentage {
+            font-size: 20px;
+            color: #4a90e2;
+            margin: 8px 0;
+        }
+    
+        .day-details {
+            font-size: 14px;
+            color: #666;
+        }
+    
+        .goal-met {
+            border-top-color: #28a745;
+        }
+    
+        .goal-missed {
+            border-top-color: #dc3545;
+        }
+    
+        .loading, .error {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    
+        .error {
+            color: #dc3545;
+        }
+    
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            color: #555;
+            font-size: 18px;
+        }
+    
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+    
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #000;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+    
+        button:hover {
+            background-color: #333;
+        }
+    
+        .goal-status {
+            margin: 30px 0;
+            font-size: 20px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 6px;
+            text-align: center;
+        }
+    
+        .back-button {
+            display: inline-block;
+            background-color: white;
+            color: black;
+            padding: 12px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            border: 2px solid #000;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+    
+        .back-button:hover {
+            background-color: #000;
+            color: white;
+        }
+        .delete-btn {
+    background: none;
+    border: none;
+    color: red;
+    font-size: 18px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    }
+    
+    .delete-btn:hover {
+    color: darkred;
+    }
+    
+        /* Custom scrollbar */
+        .food-list-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+    
+        .food-list-panel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+    
+        .food-list-panel::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+    
+        .food-list-panel::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .food-list-panel {
+                width: 250px;
+            }
+            .main-content {
+                margin-left: 250px;
+            }
+        }
+    
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .food-list-panel {
+                width: 100%;
+                height: auto;
+                position: relative;
+                max-height: 300px;
+            }
+            .main-content {
+                margin-left: 0;
+                padding-top: 0;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+    <script>
+        async function deleteFood(foodItem) {
+            if (!confirm(`Delete ${foodItem}?`)) return;
+
+            try {
+                const response = await fetch('/tracker/delete-food', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ food_item: foodItem.trim() }) 
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    fetchTrackerData();
+                } else {
+                    alert(result.error || "Failed to delete food item.");
+                }
+            } catch (error) {
+                console.error("Error deleting food:", error);
+            }
+        }
+
+        async function fetchTrackerData() {
+            try {
+                const response = await fetch('/tracker/data');
+                const data = await response.json();
+
+                document.getElementById('goal-display').innerText = data.goal || 0;
+                document.getElementById('remaining-display').innerText = data.remaining || 0;
+
+                const foodListElement = document.getElementById('food-list');
+                foodListElement.innerHTML = "";
+                
+                data.foods.forEach(item => {
+                    let li = document.createElement('li');
+                    li.innerHTML = `<span>${item.item} - ${item.protein}g</span>
+                                    <button class="delete-btn" onclick="deleteFood('${item.item}')">❌</button>`;
+                    foodListElement.appendChild(li);
+                });
+
+                fetchWeeklyData();
+            } catch (error) {
+                console.error("Error fetching tracker data:", error);
+            }
+        }
+
+        async function fetchWeeklyData() {
+            try {
+                const response = await fetch('/tracker/weekly-data');
+                if (!response.ok) throw new Error('Failed to fetch weekly data');
+                
+                const data = await response.json();
+                const statsGrid = document.querySelector('.stats-grid');
+                statsGrid.innerHTML = '';
+
+                Object.values(data).forEach(day => {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = `day-stat ${day.percentage >= 100 ? 'goal-met' : 'goal-missed'}`;
+
+                    const formattedPercentage = Math.round(day.percentage);
+                    const formattedAchieved = Math.round(day.achieved);
+                    const formattedGoal = Math.round(day.goal);
+
+                    dayElement.innerHTML = `<div class="day-name">${day.date}</div>
+                                            <div class="day-percentage">${formattedPercentage}%</div>
+                                            <div class="day-details">${formattedAchieved}g / ${formattedGoal}g</div>`;
+                    statsGrid.appendChild(dayElement);
+                });
+            } catch (error) {
+                console.error('Error fetching weekly data:', error);
+            }
+        }
+
+        document.getElementById('goal-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            let goalValue = parseFloat(document.getElementById('protein_goal').value);
+
+            if (isNaN(goalValue) || goalValue <= 0) {
+                alert("Please enter a valid protein goal.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/tracker/set-goal', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ goal: goalValue })
+                });
+
+                if (response.ok) {
+                    fetchTrackerData();
+                } else {
+                    alert("Failed to set protein goal. Try again.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("An error occurred.");
+            }
+        });
+
+        document.getElementById('food-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            let foodItem = document.getElementById('food_item').value.trim();
+            let proteinContent = parseFloat(document.getElementById('protein_content').value);
+
+            if (!foodItem || isNaN(proteinContent)) {
+                alert("Please enter a valid food item and protein content.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/tracker/add-food', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ food_item: foodItem, protein_content: proteinContent })
+                });
+
+                if (response.ok) {
+                    fetchTrackerData();
+                    document.getElementById('food_item').value = "";
+                    document.getElementById('protein_content').value = "";
+                } else {
+                    alert("Failed to log food. Try again.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("An error occurred.");
+            }
+        });
+
+        fetchTrackerData();
+    </script>
+</body>
+</html>

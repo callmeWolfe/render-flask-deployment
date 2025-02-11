@@ -1,0 +1,30 @@
+1. User Management Module
+Purpose: Handles user-related functionality.
+Key Features:
+User registration and login.
+Store user profiles and authentication data.
+Manage user-specific data like goals and logs.
+2. Food Management Module
+Purpose: Manages food item details.
+Key Features:
+Maintain a database of food items with attributes like protein-per-gram.
+Add, update, and retrieve food items.
+Link food items to consumption logs for calculations.
+3. Goal Management Module
+Purpose: Tracks and updates daily protein goals.
+Key Features:
+Set and update daily protein goals.
+Display remaining protein intake.
+Integrate with consumption logs for real-time updates.
+4. Consumption Log Module
+Purpose: Logs and tracks daily food consumption.
+Key Features:
+Log food items with weight and calculate protein consumed.
+Display the history of consumed food items.
+Provide data for goal tracking.
+5. Frontend & Backend Integration Module
+Purpose: Connects the user interface with the backend and database.
+Key Features:
+Interactive UI for goal setting, food logging, and progress tracking.
+Backend logic to process user inputs and perform calculations.
+Database operations to store and retrieve user and food data.
